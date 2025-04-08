@@ -1,9 +1,8 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken"; // <- Required for token generation
 
 const usersSchema = new mongoose.Schema(
-  {
-const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
@@ -17,12 +16,14 @@ const userSchema = new mongoose.Schema(
     password: {
       type: String,
       required: true,
-      type: String,
-      required: true,
     },
     phone: {
       type: Number,
       required: true,
+    },
+    refreshToken: {
+      type: String,
+      default: null,
     },
     contacts: [
       {
@@ -41,22 +42,8 @@ const userSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-userSchema.pre("save", async function (next) {
-  if (this.isModified("password")) {
-    this.password = await bcrypt.hash(this.password, 10);
-  }
-  next();
-      type: Number,
-      required: true,
-    },
-    refreshToken :{
-        type: String,
-        default: null,
-    }
-  },
-  { timestamps: true }
-);
 
+// Hash password before saving
 usersSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);
@@ -64,6 +51,7 @@ usersSchema.pre("save", async function (next) {
   next();
 });
 
+// Generate Access Token
 usersSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
@@ -74,16 +62,22 @@ usersSchema.methods.generateAccessToken = function () {
     { expiresIn: process.env.ACCESS_TOKEN_EXPIRY }
   );
 };
+
+// Generate Refresh Token
 usersSchema.methods.generateRefreshToken = function () {
-  return jwt.sign({ id: this._id }, process.env.REFRESH_TOKEN_SECRET, {
-    expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
-  });
+  return jwt.sign(
+    { id: this._id },
+    process.env.REFRESH_TOKEN_SECRET,
+    {
+      expiresIn: process.env.REFRESH_TOKEN_EXPIRY,
+    }
+  );
 };
 
+// Compare password for login
 usersSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };
-const User = mongoose.model("User", usersSchema);
-const User = mongoose.model("User", userSchema);
-export default User;
 
+const User = mongoose.model("User", usersSchema);
+export default User;
