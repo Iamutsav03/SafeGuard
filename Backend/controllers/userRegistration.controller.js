@@ -1,13 +1,14 @@
 import User from "../models/users.model.js";
 import asyncHandler from "../utils/asyncHandler.js";
 
-const generateAccessTokenANDRefreshToken = async (userId) => {
+const generateAccessTokenANDRefreshToken = async ( userId) => {
   const user = await User.findById(userId);
-  const accessToken = userId.generateAccessToken();
-  const refreshToken = userId.generateRefreshToken();
+  const accessToken = user.generateAccessToken();
+  const refreshToken = user.generateRefreshToken();
 
   user.refreshToken = refreshToken;
   await user.save({ validateBeforeSave: false });
+
   return { accessToken, refreshToken };
 };
 
@@ -23,19 +24,28 @@ const registerUser = asyncHandler(async (req, res) => {
     return res.status(400).json({ message: "User already exists" });
   }
   const user = await User.create({ name, email, password, phone });
-
-  return res.status(201).json({
-    status: "success",
-    message: "User registered successfully",
-    data: {
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
+  const { accessToken, refreshToken } =
+    await generateAccessTokenANDRefreshToken(user._id);
+    const option = {
+        httpOnly: true,
+        secure: true,
+      };
+  return res
+    .status(201)
+    .cookie("accessToken", accessToken, option)
+    .cookie("refreshToken", refreshToken, option)
+    .json({
+      status: "success",
+      message: "User registered successfully",
+      data: {
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+        },
       },
-    },
-  });
+    });
 });
 
 const loginUser = asyncHandler(async (req, res) => {
@@ -57,29 +67,29 @@ const loginUser = asyncHandler(async (req, res) => {
       .json({ message: "Invalid credentials : Incorrect Password" });
   }
 
-    const { accessToken, refreshToken } = await generateAccessTokenANDRefreshToken(
-        user._id
-    );
+  const { accessToken, refreshToken } =
+    await generateAccessTokenANDRefreshToken(user._id);
 
-    const option = {
-        httpOnly : true,
-        secure: true
-    }
-  return res.status(200)
-  .cookie("accessToken", accessToken, option)
-  .cookie("refreshToken", refreshToken, option)
-  .json({
-    status: "success",
-    message: "User logged in successfully",
-    data: {
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
+  const option = {
+    httpOnly: true,
+    secure: true,
+  };
+  return res
+    .status(200)
+    .cookie("accessToken", accessToken, option)
+    .cookie("refreshToken", refreshToken, option)
+    .json({
+      status: "success",
+      message: "User logged in successfully",
+      data: {
+        user: {
+          id: user._id,
+          name: user.name,
+          email: user.email,
+          phone: user.phone,
+        },
       },
-    },
-  });
+    });
 });
 
-export {registerUser , loginUser};
+export { registerUser, loginUser };
