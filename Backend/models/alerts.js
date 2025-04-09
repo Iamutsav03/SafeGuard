@@ -2,9 +2,18 @@ import mongoose from "mongoose";
 
 const alertSchema = new mongoose.Schema(
   {
-    location: {
-      type: String,
-    },
+    location: [
+      {
+        latitude: {
+          type: Number,
+          required: true,
+        },
+        longitude: {
+          type: Number,
+          required: true,
+        },
+      },
+    ],
     imageUrl: {
       type: String,
     },
@@ -12,9 +21,9 @@ const alertSchema = new mongoose.Schema(
       type: String,
     },
   },
-  { timestamps }
+  { timestamps: true }
 );
 
-const alert = mongoose.Model("Alert", alertSchema);
+const Alert = mongoose.model("Alert", alertSchema);
 
-export default alert;
+export default Alert;

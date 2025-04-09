@@ -12,4 +12,16 @@ app.use(express.static("public"));
 
 app.use("/user" , userRoute);
 
+app.post("/api/share-location",(req,res)=>{
+    const {latitude,longitude}=req.body;
+    console.log(latitude,longitude);
+    res.status(200).json({
+        success:true,
+        data:{
+            longitude,
+            latitude,
+        }
+    })
+})
+
 export default app;
