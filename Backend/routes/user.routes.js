@@ -3,6 +3,7 @@ import express from "express";
 import {registerUser,loginUser} from "../controllers/userRegistration.controller.js";
 import {addContact} from "../controllers/userDashboard.js";
 import { verifyToken } from "../middleware/auth.middleware.js";
+import { addContact } from "../controllers/userDashboard.js";
 
 const userRoute = express.Router();
 

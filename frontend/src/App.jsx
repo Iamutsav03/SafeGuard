@@ -1,6 +1,7 @@
 import React from "react";
 import { FaShieldAlt } from "react-icons/fa"; // Adding a security icon for visual appeal
 import BottomNav from "./Home/BottomNav";
+import GetLocate from "./Home/GetLocate";
 import SosButton from "./Home/SosButton";
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
       </header>
 
       <SosButton />
+      <GetLocate/>
       <BottomNav />
     </>
   );
