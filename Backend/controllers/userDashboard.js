@@ -3,8 +3,9 @@ import asyncHandler from "../utils/asyncHandler.js";
 import User from "../models/users.model.js";
 
 export const addContact = asyncHandler(async (req, res) => {
-  const { id, name, phone, email } = req.body;
-  if (!id || !name || !phone || !email) {
+  const id = req.user.id;
+  const { name, phone, email } = req.body;
+  if (!name || !phone || !email) {
     return res.status(400).json({
       success: false,
       message: "Please fill in all required fields: id, name, phone, and email.",
