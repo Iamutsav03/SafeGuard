@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRoute from "./routes/user.routes.js";
+import imageRoutes from "./routes/sosInfo.routes.js";
 
 const app = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
@@ -23,5 +24,11 @@ app.post("/api/share-location", (req, res) => {
     },
   });
 });
+
+
+app.use("/api/audio", imageRoutes);
+app.use("/api/image", imageRoutes);
+
+
 
 export default app;
