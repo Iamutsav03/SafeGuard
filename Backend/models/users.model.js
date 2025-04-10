@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import jwt from "jsonwebtoken"; // <- Required for token generation
+import jwt from "jsonwebtoken";
 
 const usersSchema = new mongoose.Schema(
   {
@@ -42,16 +42,12 @@ const usersSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-// Hash password before saving
 usersSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     this.password = await bcrypt.hash(this.password, 10);
   }
   next();
 });
-
-// Generate Access Token
 usersSchema.methods.generateAccessToken = function () {
   return jwt.sign(
     {
@@ -71,8 +67,6 @@ usersSchema.methods.generateRefreshToken = function () {
     }
   );
 };
-
-// Compare password for login
 usersSchema.methods.comparePassword = async function (password) {
   return await bcrypt.compare(password, this.password);
 };

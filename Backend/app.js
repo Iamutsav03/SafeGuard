@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import userRoute from "./routes/user.routes.js";
+import { verifyToken } from "./middleware/auth.middleware.js";
+import { getLocation, sendMessage } from "./controllers/userDashboard.js";
 
 const app = express();
 app.use(cors({ origin: process.env.CORS_ORIGIN, credentials: true }));
@@ -12,16 +14,7 @@ app.use(express.static("public"));
 
 app.use("/user" , userRoute);
 
-app.post("/api/share-location",(req,res)=>{
-    const {latitude,longitude}=req.body;
-    console.log(latitude,longitude);
-    res.status(200).json({
-        success:true,
-        data:{
-            longitude,
-            latitude,
-        }
-    })
-})
+app.post("/api/share-location",verifyToken,getLocation)
+app.post("/send-sms",verifyToken,sendMessage);
 
 export default app;
